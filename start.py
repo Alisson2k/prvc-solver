@@ -1,7 +1,9 @@
 import math
 import sys
 import random
+import time
 
+from multiprocessing import Process
 from population import Population
 from ambiente import Ambiente
 from cromossomo import Cromossomo
@@ -9,13 +11,13 @@ from functools import cmp_to_key
 from utils import compare
 
 # quantidade de iteracoes
-iterations = 1
+iterations = 10000
 
 instance = './instances/'
 
 # instância que será usada
 filename = instance + 'P-n16-k8.txt'
-veiculos = 4
+veiculos = 8
 
 f = open(filename, 'r')
 lines = f.readlines()
@@ -121,41 +123,41 @@ def selecao_roleta(population, limit):
 
     return individuos
 
-def selecao_torneio(population, limit):
-    individuos = []
-    nova_pop = []
-
-    for i in range(min(math.floor(limit * 1.5), len(population))):
-        individuos.append(population[random.randint(0, len(population) - 1)].clone())
-
-    def custom_sort(c1, c2):
-        compare_qt_restricoes = compare(c1.qt_restricoes, c2.qt_restricoes)
-        compare_aptidao_dist = compare(c1.aptidao_dist, c2.aptidao_dist)
-        compare_aptidao_cars = compare(c1.aptidao_cars, c2.aptidao_cars)
-
-        if compare_qt_restricoes == 0:
-            if compare_aptidao_dist == 0:
-                return compare_aptidao_cars
-            else:
-                return compare_aptidao_dist
-        else:
-            return compare_qt_restricoes
-
-    c_sort = cmp_to_key(custom_sort)
-    population.sort(key=c_sort)
-
-    for i in range(limit):
-        nova_pop.append(individuos[i].clone())
-
-    return nova_pop
-
 # def selecao_torneio(population, limit):
 #     individuos = []
+#     nova_pop = []
 
-#     for i in range(math.floor(len(population) / 3) + 2):
+#     for i in range(min(math.floor(limit * 1.5), len(population))):
 #         individuos.append(population[random.randint(0, len(population) - 1)].clone())
 
-#     return individuos
+#     def custom_sort(c1, c2):
+#         compare_qt_restricoes = compare(c1.qt_restricoes, c2.qt_restricoes)
+#         compare_aptidao_dist = compare(c1.aptidao_dist, c2.aptidao_dist)
+#         compare_aptidao_cars = compare(c1.aptidao_cars, c2.aptidao_cars)
+
+#         if compare_qt_restricoes == 0:
+#             if compare_aptidao_dist == 0:
+#                 return compare_aptidao_cars
+#             else:
+#                 return compare_aptidao_dist
+#         else:
+#             return compare_qt_restricoes
+
+#     c_sort = cmp_to_key(custom_sort)
+#     population.sort(key=c_sort)
+
+#     for i in range(limit):
+#         nova_pop.append(individuos[i].clone())
+
+#     return nova_pop
+
+def selecao_torneio(population, limit):
+    individuos = []
+
+    for i in range(math.floor(len(population) / 3) + 2):
+        individuos.append(population[random.randint(0, len(population) - 1)].clone())
+
+    return individuos
 
 def crossover_pmx(population):
     nova_pop = []
@@ -241,4 +243,14 @@ def resolve(population, max_gen, limit):
 
     print("Menor caminho: " + str(result / 10))
 
-resolve(population, 10, 10)
+import os
+os.nice(19)
+
+if __name__ == "__main__":
+    now = time.time()
+    p = Process(target=resolve, args=(population, 10, 10))
+    p.start()
+    p.join()
+    print(f'Demorou: {(time.time() - now):.2f}s')
+
+# resolve(population, 10, 10)
