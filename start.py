@@ -11,13 +11,13 @@ from functools import cmp_to_key
 from utils import compare
 
 # quantidade de iteracoes
-iterations = 10000
+iterations = 1
 
 instance = './instances/'
 
 # instância que será usada
-filename = instance + 'P-n16-k8.txt'
-veiculos = 8
+filename = instance + 'P-n19-k2.txt'
+veiculos = 2
 
 f = open(filename, 'r')
 lines = f.readlines()
@@ -199,6 +199,8 @@ def mutacao_aleatoria(population):
             population[i].dna[posicao_2] = aux_1
 
 def mutacao_reversa(population):
+    # for c in population:
+    #     c.dna.reverse()
     return population.reverse()
 
 def resolve(population, max_gen, limit):
@@ -211,6 +213,8 @@ def resolve(population, max_gen, limit):
             for i in range(max_gen):
                 avalia_populacao(population.population, ambiente)
 
+                # melhores_idvs = None
+                # if random.randint(0, 100) < 15:
                 melhores_idvs = elitismo(population.population, math.ceil(limit * 0.1))
 
                 seleciona_indv = selecao_torneio(population.population, limit)
@@ -248,7 +252,7 @@ os.nice(19)
 
 if __name__ == "__main__":
     now = time.time()
-    p = Process(target=resolve, args=(population, 10, 10))
+    p = Process(target=resolve, args=(population, 100000, 10))
     p.start()
     p.join()
     print(f'Demorou: {(time.time() - now):.2f}s')

@@ -60,7 +60,6 @@ class Ambiente(object):
             else:
                 new_dna.append(0)
 
-        # sys.exit(0)
         cromo.dna = new_dna
         cromo_set = set()
         for i in range(len(cromo.dna)):
